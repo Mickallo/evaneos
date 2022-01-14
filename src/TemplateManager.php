@@ -1,13 +1,23 @@
 <?php
+declare(strict_types=1);
+
+namespace App;
+
+use App\Context\ApplicationContext;
+use App\Entity\Quote;
+use App\Entity\Template;
+use App\Entity\User;
+use App\Repository\DestinationRepository;
+use App\Repository\QuoteRepository;
+use App\Repository\SiteRepository;
 
 class TemplateManager
 {
+    /**
+     * @return Template
+     */
     public function getTemplateComputed(Template $tpl, array $data)
     {
-        if (!$tpl) {
-            throw new \RuntimeException('no tpl given');
-        }
-
         $replaced = clone($tpl);
         $replaced->subject = $this->computeText($replaced->subject, $data);
         $replaced->content = $this->computeText($replaced->content, $data);
@@ -15,7 +25,7 @@ class TemplateManager
         return $replaced;
     }
 
-    private function computeText($text, array $data)
+    private function computeText(string $text, array $data): string
     {
         $APPLICATION_CONTEXT = ApplicationContext::getInstance();
 

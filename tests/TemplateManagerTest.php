@@ -1,31 +1,29 @@
 <?php
+declare(strict_types=1);
 
-require_once __DIR__ . '/../src/Entity/Destination.php';
-require_once __DIR__ . '/../src/Entity/Quote.php';
-require_once __DIR__ . '/../src/Entity/Site.php';
-require_once __DIR__ . '/../src/Entity/Template.php';
-require_once __DIR__ . '/../src/Entity/User.php';
-require_once __DIR__ . '/../src/Helper/SingletonTrait.php';
-require_once __DIR__ . '/../src/Context/ApplicationContext.php';
-require_once __DIR__ . '/../src/Repository/Repository.php';
-require_once __DIR__ . '/../src/Repository/DestinationRepository.php';
-require_once __DIR__ . '/../src/Repository/QuoteRepository.php';
-require_once __DIR__ . '/../src/Repository/SiteRepository.php';
-require_once __DIR__ . '/../src/TemplateManager.php';
+use App\Context\ApplicationContext;
+use App\Entity\Quote;
+use App\Entity\Template;
+use App\Repository\DestinationRepository;
+use App\TemplateManager;
+use Faker\Factory;
 
-class TemplateManagerTest extends PHPUnit_Framework_TestCase
+require_once __DIR__ . '/../vendor/autoload.php';
+
+
+class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Init the mocks
      */
-    public function setUp()
+    public function setUp(): void
     {
     }
 
     /**
      * Closes the mocks
      */
-    public function tearDown()
+    public function tearDown(): void
     {
     }
 
@@ -36,10 +34,15 @@ class TemplateManagerTest extends PHPUnit_Framework_TestCase
     {
         $faker = \Faker\Factory::create();
 
-        $expectedDestination = DestinationRepository::getInstance()->getById($faker->randomNumber());
+        $quoteId = $faker->randomNumber();
+        $siteId = $faker->randomNumber();
+        $destinationId = $faker->randomNumber();
+        $datetime = $faker->datetime();
+
+        $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
         $expectedUser = ApplicationContext::getInstance()->getCurrentUser();
 
-        $quote = new Quote($faker->randomNumber(), $faker->randomNumber(), $faker->randomNumber(), $faker->date());
+        $quote = new Quote($quoteId, $siteId, $destinationId, $datetime);
 
         $template = new Template(
             1,
@@ -53,7 +56,8 @@ Bien cordialement,
 
 L'équipe Evaneos.com
 www.evaneos.com
-");
+"
+        );
         $templateManager = new TemplateManager();
 
         $message = $templateManager->getTemplateComputed(

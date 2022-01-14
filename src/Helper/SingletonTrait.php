@@ -1,16 +1,13 @@
 <?php
+declare(strict_types=1);
+
+namespace App\Helper;
 
 trait SingletonTrait
 {
-    /**
-     * @var $this
-     */
-    protected static $instance = null;
+    protected static self|null $instance = null;
 
-    /**
-     * @return $this
-     */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!self::$instance) {
             self::$instance = new static();
