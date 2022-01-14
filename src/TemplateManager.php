@@ -1,14 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App;
 
+use App\App\ViewModel\Message\MessageAssembler;
+use App\App\ViewModel\ViewModel;
 use App\Context\ApplicationContext;
 use App\Entity\Quote;
 use App\Entity\Template;
 use App\Entity\User;
 use App\Repository\DestinationRepository;
-use App\Repository\QuoteRepository;
 use App\Repository\SiteRepository;
 
 class TemplateManager
@@ -18,64 +20,43 @@ class TemplateManager
      */
     public function getTemplateComputed(Template $tpl, array $data)
     {
-        $replaced = clone($tpl);
-        $replaced->subject = $this->computeText($replaced->subject, $data);
-        $replaced->content = $this->computeText($replaced->content, $data);
-
-        return $replaced;
+        return $this->message(
+            $tpl,
+            $this->viewModelFromData($data)->value()
+        );
     }
 
-    private function computeText(string $text, array $data): string
+    private function viewModelFromData(array $data): ViewModel
     {
-        $APPLICATION_CONTEXT = ApplicationContext::getInstance();
-
+        $applicationContext = ApplicationContext::getInstance();
+        $user = (isset($data['user']) and ($data['user'] instanceof User)) ? $data['user'] : $applicationContext->getCurrentUser();
         $quote = (isset($data['quote']) and $data['quote'] instanceof Quote) ? $data['quote'] : null;
+        //$quote = QuoteRepository::getInstance()->getById($quote->id);
+        $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
+        $site = SiteRepository::getInstance()->getById($quote->siteId);
 
-        if ($quote)
-        {
-            $_quoteFromRepository = QuoteRepository::getInstance()->getById($quote->id);
-            $usefulObject = SiteRepository::getInstance()->getById($quote->siteId);
-            $destinationOfQuote = DestinationRepository::getInstance()->getById($quote->destinationId);
+        return MessageAssembler::create(
+            $user,
+            $quote,
+            $destination,
+            $site
+        );
+    }
 
-            if(strpos($text, '[quote:destination_link]') !== false){
-                $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
-            }
+    private function message(Template $template, array $tags): Template
+    {
+        return new Template(
+            $template->id,
+            $this->compute($template->subject, $tags),
+            $this->compute($template->content, $tags)
+        );
+    }
 
-            $containsSummaryHtml = strpos($text, '[quote:summary_html]');
-            $containsSummary     = strpos($text, '[quote:summary]');
-
-            if ($containsSummaryHtml !== false || $containsSummary !== false) {
-                if ($containsSummaryHtml !== false) {
-                    $text = str_replace(
-                        '[quote:summary_html]',
-                        Quote::renderHtml($_quoteFromRepository),
-                        $text
-                    );
-                }
-                if ($containsSummary !== false) {
-                    $text = str_replace(
-                        '[quote:summary]',
-                        Quote::renderText($_quoteFromRepository),
-                        $text
-                    );
-                }
-            }
-
-            (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destinationOfQuote->countryName,$text);
-        }
-
-        if (isset($destination))
-            $text = str_replace('[quote:destination_link]', $usefulObject->url . '/' . $destination->countryName . '/quote/' . $_quoteFromRepository->id, $text);
-        else
-            $text = str_replace('[quote:destination_link]', '', $text);
-
-        /*
-         * USER
-         * [user:*]
-         */
-        $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
-        if($_user) {
-            (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]'       , ucfirst(mb_strtolower($_user->firstname)), $text);
+    private function compute(string $text, array $tags): string
+    {
+        foreach ($tags as $key => $value) {
+            $tagToReplace = "[$key]";
+            $text = str_replace($tagToReplace, $value, $text);
         }
 
         return $text;

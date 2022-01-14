@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
@@ -20,6 +21,7 @@ class QuoteRepository implements Repository
     {
         $generator = Faker\Factory::create();
         $generator->seed($id);
+
         return new Quote(
             $id,
             $generator->numberBetween(1, 10),
