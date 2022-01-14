@@ -1,13 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
-use App\Entity\Quote;
-use App\Entity\Template;
-use App\TemplateManager;
+require_once __DIR__.'/../vendor/autoload.php';
+
+use App\App\Service\ApplicationContext;
+use App\App\Service\TemplateManager;
+use App\Domain\Template;
+use App\Infra\Repository\DestinationGeneratorRepository;
+use App\Infra\Repository\QuoteGeneratorRepository;
+use App\Infra\Repository\SiteGeneratorRepository;
 use Faker\Factory;
-
-require_once __DIR__ . '/../vendor/autoload.php';
-
 
 $faker = Factory::create();
 
@@ -25,18 +28,19 @@ L'équipe Evaneos.com
 www.evaneos.com
 "
 );
-$templateManager = new TemplateManager();
+
+$templateManager = new TemplateManager(
+    ApplicationContext::getInstance(),
+    QuoteGeneratorRepository::getInstance(),
+    DestinationGeneratorRepository::getInstance(),
+    SiteGeneratorRepository::getInstance()
+);
 
 $message = $templateManager->getTemplateComputed(
     $template,
     [
-        'quote' => new Quote(
-            $faker->randomNumber(),
-            $faker->randomNumber(),
-            $faker->randomNumber(),
-            $faker->dateTime()
-        )
+        'quote' => QuoteGeneratorRepository::getInstance()->getById($faker->randomNumber()),
     ]
 );
 
-echo $message->subject . "\n" . $message->content;
+echo $message->subject."\n".$message->content;

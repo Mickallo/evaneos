@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\App\ViewModel\Message;
 
 use App\App\ViewModel\Assembler;
-use App\Entity\Destination;
-use App\Entity\Quote;
-use App\Entity\Site;
-use App\Entity\User;
+use App\Domain\Destination;
+use App\Domain\Quote;
+use App\Domain\Site;
+use App\Domain\User;
 
 class MessageAssembler implements Assembler
 {

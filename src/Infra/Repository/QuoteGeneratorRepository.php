@@ -2,22 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Infra\Repository;
 
-use App\Entity\Quote;
+use App\Domain\Quote;
+use App\Domain\QuoteRepository;
 use App\Helper\SingletonTrait;
 use Faker;
 
-class QuoteRepository implements Repository
+class QuoteGeneratorRepository implements QuoteRepository
 {
     use SingletonTrait;
 
-    /**
-     * @param int $id
-     *
-     * @return Quote
-     */
-    public function getById($id)
+    public function getById(int $id): Quote
     {
         $generator = Faker\Factory::create();
         $generator->seed($id);

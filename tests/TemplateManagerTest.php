@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Context\ApplicationContext;
-use App\Entity\Quote;
-use App\Entity\Template;
-use App\Repository\DestinationRepository;
-use App\TemplateManager;
+use App\App\Service\ApplicationContext;
+use App\App\Service\TemplateManager;
+use App\Domain\Template;
+use App\Infra\Repository\DestinationGeneratorRepository;
+use App\Infra\Repository\QuoteGeneratorRepository;
+use App\Infra\Repository\SiteGeneratorRepository;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -31,17 +32,11 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function test()
     {
-        $faker = \Faker\Factory::create();
+        $faker = Faker\Factory::create();
 
-        $quoteId = $faker->randomNumber();
-        $siteId = $faker->randomNumber();
-        $destinationId = $faker->randomNumber();
-        $datetime = $faker->datetime();
-
-        $expectedDestination = DestinationRepository::getInstance()->getById($destinationId);
+        $quote = QuoteGeneratorRepository::getInstance()->getById($faker->randomNumber());
+        $expectedDestination = DestinationGeneratorRepository::getInstance()->getById($quote->destinationId);
         $expectedUser = ApplicationContext::getInstance()->getCurrentUser();
-
-        $quote = new Quote($quoteId, $siteId, $destinationId, $datetime);
 
         $template = new Template(
             1,
@@ -57,7 +52,13 @@ L'équipe Evaneos.com
 www.evaneos.com
 "
         );
-        $templateManager = new TemplateManager();
+
+        $templateManager = new TemplateManager(
+            ApplicationContext::getInstance(),
+            QuoteGeneratorRepository::getInstance(),
+            DestinationGeneratorRepository::getInstance(),
+            SiteGeneratorRepository::getInstance()
+        );
 
         $message = $templateManager->getTemplateComputed(
             $template,

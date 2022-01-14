@@ -1,22 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Infra\Repository;
 
-use App\Entity\Site;
+use App\Domain\Site;
+use App\Domain\SiteRepository;
 use App\Helper\SingletonTrait;
 use Faker;
 
-class SiteRepository implements Repository
+class SiteGeneratorRepository implements SiteRepository
 {
     use SingletonTrait;
 
-    /**
-     * @param int $id
-     *
-     * @return Site
-     */
-    public function getById($id)
+    public function getById(int $id): Site
     {
         // DO NOT MODIFY THIS METHOD
         $faker = Faker\Factory::create();

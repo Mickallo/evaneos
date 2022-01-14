@@ -2,22 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Infra\Repository;
 
-use App\Entity\Destination;
+use App\Domain\Destination;
+use App\Domain\DestinationRepository;
 use App\Helper\SingletonTrait;
 use Faker;
 
-class DestinationRepository implements Repository
+class DestinationGeneratorRepository implements DestinationRepository
 {
     use SingletonTrait;
 
-    /**
-     * @param int $id
-     *
-     * @return Destination
-     */
-    public function getById($id)
+    public function getById(int $id): Destination
     {
         // DO NOT MODIFY THIS METHOD
 

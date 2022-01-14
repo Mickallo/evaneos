@@ -2,19 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\App\Service;
 
 use App\App\ViewModel\Message\MessageAssembler;
 use App\App\ViewModel\ViewModel;
-use App\Context\ApplicationContext;
-use App\Entity\Quote;
-use App\Entity\Template;
-use App\Entity\User;
-use App\Repository\DestinationRepository;
-use App\Repository\SiteRepository;
+use App\Domain\DestinationRepository;
+use App\Domain\Quote;
+use App\Domain\QuoteRepository;
+use App\Domain\SiteRepository;
+use App\Domain\Template;
+use App\Domain\User;
 
 class TemplateManager
 {
+    public function __construct(
+        private ApplicationContext $applicationContext,
+        private QuoteRepository $quoteRepository,
+        private DestinationRepository $destinationRepository,
+        private SiteRepository $siteRepository
+    ) {
+    }
+
     /**
      * @return Template
      */
@@ -28,12 +36,11 @@ class TemplateManager
 
     private function viewModelFromData(array $data): ViewModel
     {
-        $applicationContext = ApplicationContext::getInstance();
-        $user = (isset($data['user']) and ($data['user'] instanceof User)) ? $data['user'] : $applicationContext->getCurrentUser();
+        $user = (isset($data['user']) and ($data['user'] instanceof User)) ? $data['user'] : $this->applicationContext->getCurrentUser();
         $quote = (isset($data['quote']) and $data['quote'] instanceof Quote) ? $data['quote'] : null;
-        //$quote = QuoteRepository::getInstance()->getById($quote->id);
-        $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
-        $site = SiteRepository::getInstance()->getById($quote->siteId);
+        $quote = $this->quoteRepository->getById($quote->id);
+        $destination = $this->destinationRepository->getById($quote->destinationId);
+        $site = $this->siteRepository->getById($quote->siteId);
 
         return MessageAssembler::create(
             $user,

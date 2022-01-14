@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Context;
+namespace App\App\Service;
 
-use App\Entity\Site;
-use App\Entity\User;
+use App\Domain\Site;
+use App\Domain\User;
 use App\Helper\SingletonTrait;
 
 class ApplicationContext
