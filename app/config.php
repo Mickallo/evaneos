@@ -9,8 +9,8 @@ use App\Infra\Repository\QuoteGeneratorRepository;
 use App\Infra\Repository\SiteGeneratorRepository;
 
 return [
-    ApplicationContext::class => function () {return ApplicationContext::getInstance();},
-    DestinationRepository::class => function () {return DestinationGeneratorRepository::getInstance();},
-    QuoteRepository::class => function () {return QuoteGeneratorRepository::getInstance();},
-    SiteRepository::class => function () {return SiteGeneratorRepository::getInstance();},
+    ApplicationContext::class => function () {return ApplicationContext::create();},
+    DestinationRepository::class => DI\get(DestinationGeneratorRepository::class),
+    QuoteRepository::class => DI\get(QuoteGeneratorRepository::class),
+    SiteRepository::class => DI\get(SiteGeneratorRepository::class),
 ];

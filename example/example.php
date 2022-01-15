@@ -5,6 +5,7 @@ declare(strict_types=1);
 $container = require_once __DIR__.'/../app/bootstrap.php';
 
 use App\App\Service\TemplateManager;
+use App\Domain\QuoteRepository;
 use App\Domain\Template;
 use App\Infra\Repository\QuoteGeneratorRepository;
 use Faker\Factory;
@@ -31,7 +32,7 @@ $templateManager = $container->get(TemplateManager::class);
 $message = $templateManager->getTemplateComputed(
     $template,
     [
-        'quote' => QuoteGeneratorRepository::getInstance()->getById($faker->randomNumber()),
+        'quote' => $container->get(QuoteRepository::class)->getById($faker->randomNumber()),
     ]
 );
 

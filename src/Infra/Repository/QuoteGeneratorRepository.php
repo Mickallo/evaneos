@@ -6,13 +6,10 @@ namespace App\Infra\Repository;
 
 use App\Domain\Quote;
 use App\Domain\QuoteRepository;
-use App\Helper\SingletonTrait;
 use Faker;
 
 class QuoteGeneratorRepository implements QuoteRepository
 {
-    use SingletonTrait;
-
     public function getById(int $id): Quote
     {
         $generator = Faker\Factory::create();

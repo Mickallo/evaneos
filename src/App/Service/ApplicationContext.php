@@ -6,21 +6,23 @@ namespace App\App\Service;
 
 use App\Domain\Site;
 use App\Domain\User;
-use App\Helper\SingletonTrait;
 
 class ApplicationContext
 {
-    use SingletonTrait;
+    private function __construct(
+        private Site $currentSite,
+        private User $currentUser
+    ) {
+    }
 
-    private Site $currentSite;
-
-    private User $currentUser;
-
-    protected function __construct()
+    public static function create(): self
     {
         $faker = \Faker\Factory::create();
-        $this->currentSite = new Site($faker->randomNumber(), $faker->url);
-        $this->currentUser = new User($faker->randomNumber(), $faker->firstName, $faker->lastName, $faker->email);
+
+        return new static(
+            new Site($faker->randomNumber(), $faker->url),
+            new User($faker->randomNumber(), $faker->firstName, $faker->lastName, $faker->email)
+        );
     }
 
     public function getCurrentSite(): Site
