@@ -7,7 +7,6 @@ $container = require_once __DIR__.'/../app/bootstrap.php';
 use App\App\Service\TemplateManager;
 use App\Domain\QuoteRepository;
 use App\Domain\Template;
-use App\Infra\Repository\QuoteGeneratorRepository;
 use Faker\Factory;
 
 $faker = Factory::create();
