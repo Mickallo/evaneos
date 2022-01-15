@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__.'/../vendor/autoload.php';
+$container = require_once __DIR__.'/../app/bootstrap.php';
 
-use App\App\Service\ApplicationContext;
 use App\App\Service\TemplateManager;
 use App\Domain\Template;
-use App\Infra\Repository\DestinationGeneratorRepository;
 use App\Infra\Repository\QuoteGeneratorRepository;
-use App\Infra\Repository\SiteGeneratorRepository;
 use Faker\Factory;
 
 $faker = Factory::create();
@@ -29,12 +26,7 @@ www.evaneos.com
 "
 );
 
-$templateManager = new TemplateManager(
-    ApplicationContext::getInstance(),
-    QuoteGeneratorRepository::getInstance(),
-    DestinationGeneratorRepository::getInstance(),
-    SiteGeneratorRepository::getInstance()
-);
+$templateManager = $container->get(TemplateManager::class);
 
 $message = $templateManager->getTemplateComputed(
     $template,

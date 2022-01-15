@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 use App\App\Service\ApplicationContext;
 use App\App\Service\TemplateManager;
+use App\Domain\DestinationRepository;
+use App\Domain\QuoteRepository;
 use App\Domain\Template;
-use App\Infra\Repository\DestinationGeneratorRepository;
-use App\Infra\Repository\QuoteGeneratorRepository;
-use App\Infra\Repository\SiteGeneratorRepository;
 
-require_once __DIR__.'/../vendor/autoload.php';
+$container = require_once __DIR__.'/../app/bootstrap.php';
 
 class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private $container;
+
     /**
      * Init the mocks.
      */
     public function setUp(): void
     {
+        global $container;
+        $this->container = $container;
     }
 
     /**
@@ -34,9 +37,10 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
     {
         $faker = Faker\Factory::create();
 
-        $quote = QuoteGeneratorRepository::getInstance()->getById($faker->randomNumber());
-        $expectedDestination = DestinationGeneratorRepository::getInstance()->getById($quote->destinationId);
-        $expectedUser = ApplicationContext::getInstance()->getCurrentUser();
+        $quote = $this->container->get(QuoteRepository::class)->getById($faker->randomNumber());
+        $expectedDestination = $this->container->get(DestinationRepository::class)->getById($quote->destinationId);
+        $expectedUser = $this->container->get(ApplicationContext::class)->getCurrentUser();
+        $templateManager = $this->container->get(TemplateManager::class);
 
         $template = new Template(
             1,
@@ -51,13 +55,6 @@ Bien cordialement,
 L'équipe Evaneos.com
 www.evaneos.com
 "
-        );
-
-        $templateManager = new TemplateManager(
-            ApplicationContext::getInstance(),
-            QuoteGeneratorRepository::getInstance(),
-            DestinationGeneratorRepository::getInstance(),
-            SiteGeneratorRepository::getInstance()
         );
 
         $message = $templateManager->getTemplateComputed(
