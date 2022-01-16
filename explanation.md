@@ -33,4 +33,4 @@ PHP/DI use singleton by default, we can remove the trait
 Why do we pass class Quote in Template $data and not just quoteId ? 
 not use phpUnit for End To End but 'behat' instead with cucumber senarii 
 Use mock or DI with special config on phpunit test
-
+php/stan 
